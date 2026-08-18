@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #FFFFFF;
+  --color-secondary: #FAFAF8;
+  --color-text-main: #171717;
+  --color-text-muted: #6B6B6B;
+  --color-brand-red: #CC252C;
+  --color-brand-yellow: #F4AC1C;
+
+  --font-poppins: "Poppins", sans-serif;
+  --font-nunito: "Nunito", sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-primary);
+    color: var(--color-text-main);
+    font-family: var(--font-nunito);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-poppins);
+  }
+}
