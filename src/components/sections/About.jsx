@@ -1,20 +1,12 @@
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/gsap';
+import { imageSet } from '../../lib/images';
 
 const About = () => {
   const containerRef = useRef(null);
-  
-  // Use a media query to check for reduced motion
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
 
   useGSAP(() => {
-    if (prefersReducedMotion) return; // Skip complex animations if reduced motion is preferred
+    if (prefersReducedMotion()) return; // Skip complex animations if reduced motion is preferred
     
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -83,7 +75,10 @@ const About = () => {
             
             <div className="relative z-10 w-[90%] md:w-[85%] lg:w-[90%] about-image-main">
               <img 
-                src="/assets/resturant/interior-02.png" 
+                {...imageSet('restaurant/interior-02')}
+                sizes="(min-width: 1024px) 45vw, 90vw"
+                width="1920"
+                height="1035"
                 alt="VIP Setup comfortable dining atmosphere" 
                 className="w-full h-auto object-cover rounded-2xl shadow-xl"
                 loading="lazy"
@@ -95,7 +90,10 @@ const About = () => {
             <div className="absolute right-0 bottom-[-10%] lg:bottom-[-20%] w-[50%] lg:w-[55%] z-20 about-image-secondary about-image-secondary-parallax hidden sm:block">
               <div className="p-2 sm:p-3 bg-primary rounded-2xl shadow-2xl">
                 <img 
-                  src="/assets/resturant/exterior-sitting.png" 
+                  {...imageSet('restaurant/exterior-sitting')}
+                  sizes="(min-width: 1024px) 25vw, 45vw"
+                  width="1920"
+                  height="1080"
                   alt="VIP Setup exterior sitting area" 
                   className="w-full h-auto object-cover rounded-xl"
                   loading="lazy"

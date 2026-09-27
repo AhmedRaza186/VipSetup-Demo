@@ -1,3 +1,5 @@
+import { site, whatsappUrl } from '../../data/site';
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -10,7 +12,7 @@ const Footer = () => {
           <div className="w-full lg:w-1/3 flex flex-col items-start">
             <a href="#home" className="inline-block mb-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-white rounded-xl bg-white p-4 shadow-md transition-transform hover:-translate-y-1">
               <img 
-                src="/assets/brand/logo.png" 
+                src="/images/brand/logo.png" 
                 alt="VIP Setup Logo" 
                 className="h-12 sm:h-14 w-auto" 
               />
@@ -41,14 +43,17 @@ const Footer = () => {
             <div className="flex flex-col gap-4 text-white/80 font-nunito">
               <p>For reservations and orders:</p>
               <a 
-                href="https://wa.me/923062626261"
+                href={whatsappUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-brand-yellow font-poppins font-semibold transition-colors w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white rounded-sm"
               >
-                0306 2626261
+                {site.phoneDisplay}
               </a>
-              <p className="mt-2">Karachi, Pakistan</p>
+              <address className="mt-2 not-italic">
+                {site.streetAddress && <>{site.streetAddress}<br /></>}
+                {site.city}
+              </address>
             </div>
           </div>
 
@@ -59,7 +64,13 @@ const Footer = () => {
           <p className="text-sm text-white/80 font-nunito">
             &copy; {currentYear} VIP Setup. All rights reserved.
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <a
+              href="#admin"
+              className="text-sm text-white/60 hover:text-white font-nunito transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm"
+            >
+              Owner login
+            </a>
             <div className="w-1 h-1 rounded-full bg-white"></div>
             <div className="w-1 h-1 rounded-full bg-brand-yellow"></div>
           </div>

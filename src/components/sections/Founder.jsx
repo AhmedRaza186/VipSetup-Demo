@@ -1,20 +1,13 @@
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/gsap';
+import { imageSet } from '../../lib/images';
 
 const Founder = () => {
   const containerRef = useRef(null);
   const imageRef = useRef(null);
-  
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
 
   useGSAP(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion()) return;
     
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -98,7 +91,8 @@ const Founder = () => {
             <div className="absolute -inset-4 lg:-inset-8 bg-secondary rounded-3xl -z-10 hidden md:block opacity-50"></div>
             <div className="relative aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] w-[90%] mx-auto lg:w-full overflow-hidden rounded-2xl shadow-xl" ref={imageRef}>
               <img 
-                src="/assets/resturant/mustafa-at-vip-setup02.jpg" 
+                {...imageSet('restaurant/mustafa-at-vip-setup02')}
+                sizes="(min-width: 1024px) 50vw, 90vw"
                 alt="Mustafa Hanif, Founder of VIP Setup" 
                 className="w-full h-full object-cover" 
                 loading="lazy"

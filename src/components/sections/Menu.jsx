@@ -1,12 +1,8 @@
 import { useState, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/gsap';
 import MenuCategoryNav from '../ui/MenuCategoryNav';
 import MenuItem from '../ui/MenuItem';
 import { menuCategories, menuItems } from '../../data/menu';
-
-gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState(menuCategories[0].id);
@@ -17,6 +13,8 @@ const Menu = () => {
 
   // Initial Entrance Animation
   useGSAP(() => {
+    if (prefersReducedMotion()) return;
+
     const tl = gsap.timeline({ 
       defaults: { ease: 'power3.out' },
       scrollTrigger: {
@@ -42,10 +40,17 @@ const Menu = () => {
   // Handle Category Switching Animation
   const handleCategorySwitch = (newCategoryId) => {
     if (newCategoryId === activeCategory || isTransitioning) return;
-    
-    setIsTransitioning(true);
+
+    const nextItems = menuItems.filter(item => item.category === newCategoryId);
     setActiveCategory(newCategoryId);
-    
+
+    if (prefersReducedMotion()) {
+      setDisplayItems(nextItems);
+      return;
+    }
+
+    setIsTransitioning(true);
+
     const items = itemsContainerRef.current.querySelectorAll('.menu-item-wrapper');
     
     // Animate out
@@ -57,7 +62,7 @@ const Menu = () => {
       ease: 'power2.in',
       onComplete: () => {
         // Update DOM to new items
-        setDisplayItems(menuItems.filter(item => item.category === newCategoryId));
+        setDisplayItems(nextItems);
         setIsTransitioning(false);
       }
     });
@@ -65,6 +70,8 @@ const Menu = () => {
 
   // Animate items in whenever displayItems updates
   useGSAP(() => {
+    if (prefersReducedMotion()) return;
+
     const items = itemsContainerRef.current.querySelectorAll('.menu-item-wrapper');
     if (items.length === 0) return;
 

@@ -1,25 +1,17 @@
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/gsap';
 import FeaturedDish from '../ui/FeaturedDish';
 import { menuItems } from '../../data/menu';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const FeaturedFood = () => {
   const containerRef = useRef(null);
   
   // Select 3 signature dishes for the showcase from existing menu data
   const signatureItemIds = ['pp4', 'b3', 'gb2']; // VIP Special Sriracha, VIP Special Zingro, Cheese Garlic Bread
-  const signatureDishes = signatureItemIds.map(id => menuItems.find(item => item.id === id));
-
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
+  const signatureDishes = signatureItemIds.map(id => menuItems.find(item => item.id === id)).filter(Boolean);
 
   useGSAP(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion()) return;
     
     const tl = gsap.timeline({
       scrollTrigger: {

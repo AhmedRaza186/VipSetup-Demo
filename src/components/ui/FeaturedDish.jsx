@@ -1,21 +1,17 @@
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/gsap';
+import { imageSet } from '../../lib/images';
+import { addToCart, openCart, useSoldOut } from '../../lib/store';
+import { hmmmBurst } from '../../lib/burst';
 
 const FeaturedDish = ({ dish, index, reverse }) => {
+  const soldOut = useSoldOut().includes(dish.id);
   const containerRef = useRef(null);
   const imageRef = useRef(null);
   const textRef = useRef(null);
-  
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
 
   useGSAP(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion()) return;
     
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -62,7 +58,8 @@ const FeaturedDish = ({ dish, index, reverse }) => {
         <div className="absolute -inset-4 sm:-inset-6 lg:-inset-8 bg-secondary rounded-3xl -z-10 hidden sm:block opacity-60"></div>
         <div className="relative aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-xl" ref={imageRef}>
           <img 
-            src={dish.image} 
+            {...imageSet(dish.image)}
+            sizes="(min-width: 1024px) 50vw, 100vw"
             alt={dish.name} 
             className="w-full h-[120%] object-cover -mt-[10%]" // Extra height for parallax
             loading="lazy"
@@ -84,14 +81,18 @@ const FeaturedDish = ({ dish, index, reverse }) => {
         </p>
         <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10 dish-anim">
           <span className="text-3xl font-poppins font-bold text-brand-red">{dish.price}</span>
-          <a 
-            href="https://wa.me/923062626261"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-10 py-4 border-2 border-text-main text-lg font-poppins font-semibold rounded-full text-text-main hover:bg-text-main hover:text-white transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-text-main"
+          <button
+            type="button"
+            disabled={soldOut}
+            onClick={(e) => {
+              hmmmBurst(e.currentTarget);
+              addToCart(dish.id);
+              setTimeout(openCart, 450); // let the burst land before the drawer slides in
+            }}
+            className="inline-flex items-center justify-center px-10 py-4 border-2 border-text-main text-lg font-poppins font-semibold rounded-full text-text-main hover:bg-text-main hover:text-white hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-40 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-text-main"
           >
-            Try It
-          </a>
+            {soldOut ? 'Sold out today' : 'Try It'}
+          </button>
         </div>
       </div>
     </div>

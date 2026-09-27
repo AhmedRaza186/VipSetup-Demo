@@ -30,40 +30,48 @@ This project leverages a cutting-edge front-end stack:
 - **GSAP** (GreenSock Animation Platform)
 - **@gsap/react**
 - **Lenis** (Smooth Scrolling)
-- **HTML/CSS**
 - **Google Fonts** (Poppins, Nunito)
 
 ## Project Structure
 
-The project maintains a strict, scalable React architecture:
-
 ```text
+assets-src/               # Full-resolution original photos (not served)
+scripts/
+└── optimize-images.mjs   # Builds WebP variants into public/images/
+public/images/            # Generated, web-sized images (640/1280/1920w WebP) + brand files
 src/
-├── components/       # UI building blocks
-│   ├── layout/       # Global components (Navbar, Footer, Intro, SmoothScroll)
-│   ├── motion/       # Reusable GSAP/animation wrappers
-│   ├── sections/     # Major page sections (Hero, Menu, About, Location, etc.)
-│   └── ui/           # Atomic UI elements (Buttons, Cards, Modals)
-├── data/             # Static JSON/JS data files (Menu items, categories)
-├── hooks/            # Custom React hooks
-├── lib/              # Third-party library configurations
-├── pages/            # Top-level route components
-├── styles/           # Global styles and Tailwind configuration
-├── utils/            # Helper functions
-├── App.jsx           # Main application composition
-├── App.css           # Base component CSS
-├── index.css         # Tailwind directives and base layers
-└── main.jsx          # React DOM entry point
+├── components/
+│   ├── layout/           # Navbar, Footer, Intro, SmoothScroll
+│   ├── sections/         # Page sections (Hero, Menu, About, Location, ...)
+│   └── ui/               # Button, MenuItem, MenuCategoryNav, FeaturedDish
+├── data/
+│   ├── menu.js           # Menu categories and items
+│   └── site.js           # Contact details, address, hours, WhatsApp link helpers
+├── lib/
+│   ├── gsap.js           # GSAP plugin registration + prefersReducedMotion()
+│   └── images.js         # imageSet() -> { src, srcSet } for generated images
+├── App.jsx
+├── index.css             # Tailwind v4 theme tokens and base styles
+└── main.jsx
 ```
 
-## Assets
+## Images
 
-The definitive source of truth for all project assets resides in the `public/assets/` directory.
+Put originals in `assets-src/` (lowercase, hyphenated names), then run:
 
-The major asset categories include:
-- `brand`
-- `food`
-- `resturant`
+```bash
+npm run images
+```
+
+Reference them in code by path without extension, e.g. `imageSet('food/pizza/chicken-tikka')`.
+
+## Demo features
+
+- **Cart → WhatsApp**: add items, adjust quantities, and send one formatted order message.
+- **Owner dashboard preview** at `/#admin` (demo PIN `1234`, also linked as "Owner login" in the footer). Sample stats; the sold-out toggles are real and update the menu live in other tabs on the same device (localStorage).
+- **Link preview image**: `npm run og` regenerates `public/images/og.jpg`.
+- **HMMM burst + pizza spin scene**: add-to-order pops a branded burst; a pinned scroll scene spins the Loaded Supreme (`node scripts/make-spin-image.mjs` rebuilds the cutout).
+- **One-page proposal** at `/#proposal`. Edit `src/data/proposal.js` (prices, contact), then `npm run proposal` rebuilds `public/VIP-Setup-Proposal.pdf`.
 
 ## Getting Started
 

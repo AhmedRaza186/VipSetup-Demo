@@ -1,19 +1,13 @@
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/gsap';
+import { whatsappUrl } from '../../data/site';
+import Button from '../ui/Button';
 
 const FinalCTA = () => {
   const containerRef = useRef(null);
-  
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
 
   useGSAP(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion()) return;
     
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -44,21 +38,13 @@ const FinalCTA = () => {
         </h2>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full sm:w-auto cta-button">
-          <a 
-            href="https://wa.me/923062626261"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center px-12 py-5 border border-transparent text-xl font-poppins font-semibold rounded-full text-white bg-brand-red hover:bg-[#A81E24] transition-colors duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-red"
-          >
+          <Button href={whatsappUrl()} external className="w-full sm:w-auto px-12 py-5 text-xl">
             Order Now
-          </a>
+          </Button>
           
-          <a 
-            href="#location"
-            className="w-full sm:w-auto inline-flex items-center justify-center px-12 py-5 border-2 border-text-main text-xl font-poppins font-semibold rounded-full text-text-main hover:bg-text-main hover:text-white transition-colors duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-text-main"
-          >
+          <Button href="#location" variant="outline" className="w-full sm:w-auto px-12 py-5 text-xl">
             Visit Us
-          </a>
+          </Button>
         </div>
         
       </div>

@@ -1,20 +1,22 @@
-import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+import { useEffect, useRef, useState } from 'react';
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/gsap';
+import { site, whatsappUrl, formatTime, getOpeningStatus } from '../../data/site';
+import Button from '../ui/Button';
 
 const Location = () => {
   const containerRef = useRef(null);
+  const [status, setStatus] = useState(() => getOpeningStatus());
+  const today = site.hours[status.today];
+
+  // Keep the open/closed badge current if the page stays open across a boundary.
+  useEffect(() => {
+    const id = setInterval(() => setStatus(getOpeningStatus()), 60_000);
+    return () => clearInterval(id);
+  }, []);
   const mapRef = useRef(null);
-  
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
 
   useGSAP(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion()) return;
     
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -56,7 +58,6 @@ const Location = () => {
 
   }, { scope: containerRef });
 
-  const googleMapsUrl = "https://www.google.com/maps/place/Vip+Setup/@24.8842244,67.0689471,17z/data=!4m15!1m8!3m7!1s0x3eb33f00740b4a13:0x15b95fa36d187cd0!2sVip+Setup!8m2!3d24.8840231!4d67.0687897!10e1!16s%2Fg%2F11zck2z2m5!3m5!1s0x3eb33f00740b4a13:0x15b95fa36d187cd0!8m2!3d24.8840231!4d67.0687897!16s%2Fg%2F11zck2z2m5";
 
   return (
     <section id="location" className="py-24 lg:py-32 bg-primary relative overflow-hidden" ref={containerRef}>
@@ -75,37 +76,42 @@ const Location = () => {
             
             <div className="space-y-8 mb-12">
               <div className="location-info">
-                <h3 className="text-xl font-poppins font-semibold text-text-main mb-2">Connect & Order</h3>
+                <h3 className="text-xl font-poppins font-semibold text-text-main mb-2">Address</h3>
+                <address className="text-lg text-text-muted font-nunito leading-relaxed not-italic">
+                  {site.streetAddress && <>{site.streetAddress}<br /></>}
+                  {site.city}
+                </address>
+              </div>
+
+              <div className="location-info">
+                <h3 className="text-xl font-poppins font-semibold text-text-main mb-2">Opening Hours</h3>
                 <p className="text-lg text-text-muted font-nunito leading-relaxed">
-                  Reach out to us directly for reservations, event bookings, and orders.
+                  <span className="text-text-main font-poppins font-semibold">{today.day}</span>
+                  {' · '}
+                  {formatTime(today.open)} – {formatTime(today.close)}
                 </p>
               </div>
 
               <div className="location-info">
-                <h3 className="text-xl font-poppins font-semibold text-text-main mb-2">WhatsApp</h3>
-                <p className="text-lg text-brand-red font-poppins font-semibold">
-                  0306 2626261
-                </p>
+                <h3 className="text-xl font-poppins font-semibold text-text-main mb-2">Reservations & Orders</h3>
+                <a
+                  href={whatsappUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg text-brand-red font-poppins font-semibold hover:underline"
+                >
+                  WhatsApp {site.phoneDisplay}
+                </a>
               </div>
             </div>
 
-            <div className="location-cta flex flex-col sm:flex-row gap-6">
-              <a 
-                href="https://wa.me/923062626261"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-poppins font-semibold rounded-full text-white bg-brand-red hover:bg-[#A81E24] transition-colors duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
-              >
+            <div className="location-cta flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-6">
+              <Button href={whatsappUrl()} external className="px-8 py-4 text-lg">
                 Order on WhatsApp
-              </a>
-              <a 
-                href={googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-8 py-4 border-2 border-text-main text-lg font-poppins font-semibold rounded-full text-text-main hover:bg-text-main hover:text-white transition-colors duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
-              >
+              </Button>
+              <Button href={site.mapsUrl} external variant="outline" className="px-8 py-4 text-lg">
                 Open in Google Maps
-              </a>
+              </Button>
             </div>
           </div>
 
@@ -115,11 +121,11 @@ const Location = () => {
             <div className="relative aspect-[4/3] sm:aspect-[16/10] w-full overflow-hidden rounded-2xl shadow-xl bg-secondary" ref={mapRef}>
               <iframe
                 title="VIP Setup Location Map"
-                src="https://maps.google.com/maps?q=24.8840231,67.0687897&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                src={`https://maps.google.com/maps?q=${site.geo.lat},${site.geo.lng}&z=16&output=embed`}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
-                allowFullScreen=""
+                allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 className="w-full h-full object-cover"

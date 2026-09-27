@@ -1,9 +1,7 @@
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP } from '../../lib/gsap';
 
-gsap.registerPlugin(useGSAP);
-
+// Only mounted when the intro should play (see App.jsx), so no reduced-motion branch is needed here.
 const Intro = ({ onComplete }) => {
   const containerRef = useRef(null);
   const leftPanelRef = useRef(null);
@@ -12,26 +10,9 @@ const Intro = ({ onComplete }) => {
   const leftTextRef = useRef(null);
   const rightTextRef = useRef(null);
 
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
-
   useGSAP(() => {
-    // Lock body scroll during intro
-    document.body.style.overflow = 'hidden';
-
-    const cleanup = () => {
-      document.body.style.overflow = '';
-      if (onComplete) onComplete();
-    };
-
-    if (prefersReducedMotion) {
-      cleanup();
-      return;
-    }
-
     const tl = gsap.timeline({
-      onComplete: cleanup,
+      onComplete,
       defaults: { ease: 'power3.out' }
     });
 
@@ -81,12 +62,10 @@ const Intro = ({ onComplete }) => {
 
   }, { scope: containerRef });
 
-  if (prefersReducedMotion) return null;
-
   return (
-    <div 
-      ref={containerRef} 
-      className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto"
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-auto overflow-hidden"
       aria-hidden="true"
     >
       {/* Cinematic Curtains */}
@@ -95,17 +74,17 @@ const Intro = ({ onComplete }) => {
 
       {/* Content Layer */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full px-6">
-        
+
         {/* Authentic Large Logo */}
         <div ref={logoRef} className="opacity-0">
-          <img 
-            src="/assets/brand/logo.png" 
-            alt="VIP Setup Logo" 
-            className="w-[220px] sm:w-[280px] md:w-[320px] lg:w-[380px] h-auto object-contain" 
+          <img
+            src="/images/brand/logo.png"
+            alt="VIP Setup Logo"
+            className="w-[220px] sm:w-[280px] md:w-[320px] lg:w-[380px] h-auto object-contain"
             loading="eager"
           />
         </div>
-        
+
         {/* Splittable Brand Signature */}
         <div className="mt-12 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-poppins font-bold tracking-[0.2em] text-brand-red uppercase">
           <span ref={leftTextRef} className="opacity-0 inline-block">HM</span>

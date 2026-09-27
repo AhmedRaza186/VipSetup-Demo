@@ -1,10 +1,8 @@
 import { useState, useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/gsap';
+import Button from '../ui/Button';
 
-gsap.registerPlugin(useGSAP);
-
-const Navbar = () => {
+const Navbar = ({ ready = true }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -16,6 +14,17 @@ const Navbar = () => {
   ];
 
   useGSAP(() => {
+    if (prefersReducedMotion()) return;
+
+    const elements = containerRef.current.querySelectorAll('.nav-anim');
+
+    // Hold the hidden state while the intro plays so the entrance is actually seen.
+    if (!ready) {
+      gsap.set(containerRef.current, { opacity: 0 });
+      gsap.set(elements, { y: -15, opacity: 0 });
+      return;
+    }
+
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
     // Navbar container subtle fade in
@@ -26,14 +35,13 @@ const Navbar = () => {
     );
 
     // Staggered entrance for logo, links, and CTA
-    const elements = containerRef.current.querySelectorAll('.nav-anim');
     tl.fromTo(
       elements,
       { y: -15, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.8, stagger: 0.1 },
       "-=0.3" // overlap
     );
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [ready] });
 
   return (
     <header className="sticky top-0 z-50 w-full bg-primary border-b border-secondary" ref={containerRef}>
@@ -50,7 +58,7 @@ const Navbar = () => {
             aria-label="VIP Setup Home"
           >
             <img 
-              src="/assets/brand/logo.png" 
+              src="/images/brand/logo.png" 
               alt="VIP Setup Logo" 
               className="h-14 md:h-16 lg:h-20 w-auto object-contain"
             />
@@ -72,26 +80,16 @@ const Navbar = () => {
 
         {/* Right: Desktop CTA */}
         <div className="hidden md:flex flex-shrink-0 items-center nav-anim">
-          <a 
-            href="https://wa.me/923062626261"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-poppins inline-flex items-center justify-center px-8 py-3 border border-transparent text-sm lg:text-base font-semibold rounded-full text-white bg-brand-red hover:bg-[#A81E24] transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-red"
-          >
+          <Button href="#menu" className="px-8 py-3 text-sm lg:text-base">
             Order Now
-          </a>
+          </Button>
         </div>
 
         {/* Mobile navigation controls (Menu Trigger & CTA) */}
         <div className="flex md:hidden items-center gap-4 nav-anim">
-          <a 
-            href="https://wa.me/923062626261"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-poppins inline-flex items-center justify-center px-5 py-2 border border-transparent text-sm font-semibold rounded-full text-white bg-brand-red hover:bg-[#A81E24] transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-red"
-          >
+          <Button href="#menu" className="px-5 py-2 text-sm">
             Order
-          </a>
+          </Button>
           <button
             type="button"
             className="inline-flex items-center justify-center p-2 rounded-md text-text-main hover:text-brand-red focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-red transition-colors"
@@ -99,7 +97,7 @@ const Navbar = () => {
             aria-expanded={isMobileMenuOpen}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            <span className="sr-only">Open main menu</span>
+            <span className="sr-only">{isMobileMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
             {isMobileMenuOpen ? (
               <svg className="block h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
