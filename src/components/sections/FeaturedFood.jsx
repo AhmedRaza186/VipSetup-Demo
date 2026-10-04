@@ -16,7 +16,7 @@ const FeaturedFood = () => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top 75%',
+        start: 'top 85%',
       }
     });
 
